@@ -1,7 +1,24 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 const Card = ({ postOffices, onSelect }) => {
   const [selectedCard, setSelectedCard] = useState(null);
+  const [numCardsPerRow, setNumCardsPerRow] = useState(4);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const screenWidth = window.innerWidth;
+      if (screenWidth < 768) {
+        setNumCardsPerRow(2); // Adjust the number of cards per row for smaller screens
+      } else {
+        setNumCardsPerRow(4);
+      }
+    };
+
+    handleResize(); // Call it once to set initial state
+    window.addEventListener("resize", handleResize); // Add event listener for window resize
+
+    return () => window.removeEventListener("resize", handleResize); // Clean up event listener
+  }, []);
 
   const handleCardClick = (office, index) => {
     if (onSelect) {
@@ -10,8 +27,7 @@ const Card = ({ postOffices, onSelect }) => {
     setSelectedCard(index);
   };
 
-  const numCardsPerRow = 4; 
-  const cardWidth = `calc(${100 / numCardsPerRow}% - 20px)`; 
+  const cardWidth = `calc(${100 / numCardsPerRow}% - 20px)`; // Calculate card width based on the number of cards per row
 
   const styles = {
     cardContainer: {
