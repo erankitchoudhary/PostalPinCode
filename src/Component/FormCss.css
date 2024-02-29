@@ -1,0 +1,101 @@
+body {
+  font-family: "Roboto", sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: red;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+}
+
+.form {
+  width: 80%;
+  max-width: 90%;
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #ffffff;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333333;
+  font-size: 24px;
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+}
+
+.input {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 16px;
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.input:focus {
+  border-color: #007bff;
+}
+
+.label {
+  font-size: 16px;
+  color: #333333;
+  margin-bottom: 6px;
+}
+
+.submitButton {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submitButton:hover {
+  background-color: #0056b3;
+}
+
+.errorText {
+  color: red;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.cardSection {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.logoContainer {
+  width: 200px; /* Set width according to your image */
+  height: 100px; /* Set height according to your image */
+  background-image: url("https://th.bing.com/th/id/R.9b902ce8e29f8c0cea66bce367fb6cb4?rik=NuNiEACVdOAPYQ&riu=http%3a%2f%2fegov.eletsonline.com%2fwp-content%2fuploads%2f2012%2f04%2findia-post-logo.jpg&ehk=%2bPBpWSELC%2bqQkYNFj%2blzwBqci0dYX7v5nyjZSJdz%2fTU%3d&risl=&pid=ImgRaw&r=0");
+  background-size: cover;
+  position: absolute; /* Set position to absolute */
+  top: 20px; /* Adjust top position */
+  right: 20px; /* Adjust right position */
+}
+
+.formHeader {
+  display: flex;
+  align-items: center;
+}
+
+.formHeader img {
+  max-width: 100%; /* Ensure image doesn't exceed its container width */
+  height: auto; /* Ensure image maintains aspect ratio */
+}
