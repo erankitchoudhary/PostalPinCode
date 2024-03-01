@@ -1,9 +1,7 @@
-import React, { useState, useMemo } from "react";
-import "./FormCss.css";
-
+import React, { useState, useEffect, useRef } from "react";
+import "./FormCss.css"; // Assuming you have CSS for styling form elements
 import TextInput from "./TextInput";
-import FetchData from "./FetchData";
-import Card from "./Cards";
+import LazyLoadedCard from "./LazyLoadedCard";
 
 const MyForm = () => {
   const [name, setName] = useState("");
@@ -14,6 +12,39 @@ const MyForm = () => {
   const [selectedCard, setSelectedCard] = useState(null);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [fetchDataError, setFetchDataError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isCardLoaded, setIsCardLoaded] = useState(false);
+
+  const debounceTimeout = useRef(null);
+
+  useEffect(() => {
+    if (pin && pin.length === 6) {
+      setIsLoading(true);
+      clearTimeout(debounceTimeout.current);
+      debounceTimeout.current = setTimeout(fetchData, 5000); // Adjust the delay as needed
+    }
+  }, [pin]);
+
+  const fetchData = async () => {
+    try {
+      const res = await fetch(`https://api.postalpincode.in/pincode/${pin}`);
+      if (!res.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await res.json();
+      if (data[0]?.PostOffice) {
+        setPinData(data[0]?.PostOffice);
+        setFetchDataError(null);
+      } else {
+        throw new Error("No data found for the provided pincode");
+      }
+    } catch (err) {
+      console.error(err);
+      setFetchDataError("Failed to fetch data. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,13 +57,7 @@ const MyForm = () => {
       !isValidEmail(email) ||
       !isValidMobile(mobile)
     ) {
-      window.alert("Form validation failed: Incomplete or invalid form data");
-      return;
-    }
-    const isConfirmed = window.confirm(
-      "Are you sure you want to submit the data?"
-    );
-    if (!isConfirmed) {
+      setFormSubmitted(true);
       return;
     }
     const formData = {
@@ -42,43 +67,30 @@ const MyForm = () => {
       Address: selectedCard,
       pin,
     };
-    window.alert(
-      `Form submitted successfully! Form Data: ${JSON.stringify(formData)}`
-    );
     console.log("Form submitted with payload:", formData);
     setFormSubmitted(true);
   };
+
   const isValidEmail = (email) => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|in)$/;
     return emailRegex.test(email);
   };
+
   const isValidMobile = (mobile) => {
     const mobileRegex = /^[1-9][0-9]{9}$/;
     return mobileRegex.test(mobile);
   };
-
-  // useMemo for memoizing pinData related components
-  const memoizedCardComponent = useMemo(() => {
-    return (
-      pinData?.length > 0 && (
-        <Card postOffices={pinData} onSelect={setSelectedCard} />
-      )
-    );
-  }, [pinData]);
-
-  // useMemo for memoizing form submission message
-  const memoizedSubmissionMessage = useMemo(() => {
-    return (
-      formSubmitted && <p className="errorText">Form submitted successfully!</p>
-    );
-  }, [formSubmitted]);
 
   return (
     <div className="container">
       <form onSubmit={handleSubmit} className="form">
         <div className="formHeader">
           <h2>POSTAL PIN CODE INFORMATION</h2>
-         <img  src="https://th.bing.com/th/id/R.9b902ce8e29f8c0cea66bce367fb6cb4?rik=NuNiEACVdOAPYQ&riu=http%3a%2f%2fegov.eletsonline.com%2fwp-content%2fuploads%2f2012%2f04%2findia-post-logo.jpg&ehk=%2bPBpWSELC%2bqQkYNFj%2blzwBqci0dYX7v5nyjZSJdz%2fTU%3d&risl=&pid=ImgRaw&r=0" style={{width:"300px"}}/>
+          <img
+            src="https://th.bing.com/th/id/R.9b902ce8e29f8c0cea66bce367fb6cb4?rik=NuNiEACVdOAPYQ&riu=http%3a%2f%2fegov.eletsonline.com%2fwp-content%2fuploads%2f2012%2f04%2findia-post-logo.jpg&ehk=%2bPBpWSELC%2bqQkYNFj%2blzwBqci0dYX7v5nyjZSJdz%2fTU%3d&risl=&pid=ImgRaw&r=0"
+            style={{ width: "300px" }}
+            alt="India Post Logo"
+          />
         </div>
 
         <div className="inputGroup">
@@ -88,9 +100,12 @@ const MyForm = () => {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="input"
+            className={`input form-control ${formSubmitted && !name ? "error" : ""}`}
             labelStyle="label"
           />
+          {formSubmitted && !name && (
+            <p className="errorText text-danger">Name is required.</p>
+          )}
         </div>
 
         <div className="inputGroup">
@@ -100,9 +115,17 @@ const MyForm = () => {
             value={email}
             onChange={(e) => setEmail(e.target.value.trim().toLowerCase())}
             required
-            className="input"
+            className={`input form-control ${formSubmitted && (!email || !isValidEmail(email)) ? "error" : ""}`}
             labelStyle="label"
           />
+          {formSubmitted && !email && (
+            <p className="errorText text-danger">Email is required.</p>
+          )}
+          {formSubmitted && email && !isValidEmail(email) && (
+            <p className="errorText text-danger">
+              Enter a valid email address.
+            </p>
+          )}
         </div>
 
         <div className="inputGroup">
@@ -118,9 +141,17 @@ const MyForm = () => {
             }}
             required
             pattern="[1-9][0-9]{9}"
-            className="input"
+            className={`input form-control ${formSubmitted && (!mobile || !isValidMobile(mobile)) ? "error" : ""}`}
             labelStyle="label"
           />
+          {formSubmitted && !mobile && (
+            <p className="errorText text-danger">Mobile Number is required.</p>
+          )}
+          {formSubmitted && mobile && !isValidMobile(mobile) && (
+            <p className="errorText text-danger">
+              Mobile Number should be of 10 digits.
+            </p>
+          )}
         </div>
 
         <div className="inputGroup">
@@ -131,26 +162,46 @@ const MyForm = () => {
             onChange={(e) => setPin(e.target.value)}
             required
             pattern="[0-9]{6}"
-            className="input"
+            className={`input form-control ${formSubmitted && !pin ? "error" : ""}`}
             labelStyle="label"
           />
+          {formSubmitted && !pin && (
+            <p className="errorText text-danger">Enter PIN is required.</p>
+          )}
         </div>
 
-        <FetchData
-          pin={pin}
-          setPinData={setPinData}
-          setFetchDataError={setFetchDataError}
-        />
+        {isLoading ? (
+          <div className="loader"></div>
+        ) : pin && pin.length === 6 ? (
+          <div className="cardSection">
+            <LazyLoadedCard
+              pin={pin}
+              postOffices={pinData}
+              onSelect={(card) => {
+                setSelectedCard(card);
+                setIsCardLoaded(true);
+              }}
+            />
+          </div>
+        ) : null}
 
-        <div className="cardSection">{memoizedCardComponent}</div>
-
-        <button type="submit" className="submitButton">
+        <button
+          type="submit"
+          className={`submitButton btn btn-primary ${formSubmitted ? "disabled" : ""}`}
+          disabled={formSubmitted}
+        >
           Submit
         </button>
 
-        {memoizedSubmissionMessage}
+        {formSubmitted && (
+          <p className="successText text-success">
+            Form submitted successfully!
+          </p>
+        )}
 
-        {fetchDataError && <p className="errorText">{fetchDataError}</p>}
+        {!isCardLoaded && fetchDataError && (
+          <p className="errorText text-danger">{fetchDataError}</p>
+        )}
       </form>
     </div>
   );
