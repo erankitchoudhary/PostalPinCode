@@ -8,14 +8,14 @@ const Card = ({ postOffices, onSelect }) => {
     const handleResize = () => {
       const screenWidth = window.innerWidth;
       if (screenWidth < 768) {
-        setNumCardsPerRow(2); // Adjust the number of cards per row for smaller screens
+        setNumCardsPerRow(2);
       } else {
         setNumCardsPerRow(4);
       }
     };
 
-    handleResize(); // Call it once to set initial state
-    window.addEventListener("resize", handleResize); // Add event listener for window resize
+    handleResize();
+    window.addEventListener("resize", handleResize);
 
     return () => window.removeEventListener("resize", handleResize); // Clean up event listener
   }, []);
@@ -27,7 +27,7 @@ const Card = ({ postOffices, onSelect }) => {
     setSelectedCard(index);
   };
 
-  const cardWidth = `calc(${100 / numCardsPerRow}% - 20px)`; // Calculate card width based on the number of cards per row
+  const cardWidth = `calc(${100 / numCardsPerRow}% - 20px)`;
 
   const styles = {
     cardContainer: {
