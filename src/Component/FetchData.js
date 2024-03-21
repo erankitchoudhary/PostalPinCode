@@ -29,7 +29,6 @@ const FetchData = ({ pin, setPinData, setFetchDataError }) => {
     }
   };
 
-  // Clear error message when PIN changes
   useEffect(() => {
     setFetchDataError(null);
   }, [pin, setFetchDataError]);

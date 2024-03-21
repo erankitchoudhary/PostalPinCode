@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import "./FormCss.css"; // Assuming you have CSS for styling form elements
+import "./FormCss.css";
 import TextInput from "./TextInput";
 import LazyLoadedCard from "./LazyLoadedCard";
 
@@ -21,7 +21,7 @@ const MyForm = () => {
     if (pin && pin.length === 6) {
       setIsLoading(true);
       clearTimeout(debounceTimeout.current);
-      debounceTimeout.current = setTimeout(fetchData, 5000); // Adjust the delay as needed
+      debounceTimeout.current = setTimeout(fetchData, 2000);
     }
   }, [pin]);
 
