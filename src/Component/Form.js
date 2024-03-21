@@ -57,7 +57,8 @@ const MyForm = () => {
       !isValidEmail(email) ||
       !isValidMobile(mobile)
     ) {
-      setFormSubmitted(true);
+      setFormSubmitted(false);
+      window.alert("Please fill in all the required fields.");
       return;
     }
     const formData = {
@@ -68,6 +69,12 @@ const MyForm = () => {
       pin,
     };
     console.log("Form submitted with payload:", formData);
+    const addressString = Object.entries(formData.Address)
+      .map(([key, value]) => `${key}: ${value}`)
+      .join("\n");
+    window.alert(
+      `Form submitted successfully!\nName: ${formData.name}\nMobile: ${formData.mobile}\nEmail: ${formData.email}\nAddress:\n${addressString}\nPIN: ${formData.pin}`,
+    );
     setFormSubmitted(true);
   };
 
